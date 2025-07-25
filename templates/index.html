@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Produtos - Consumo da API</title>
+</head>
+<body>
+    <h1>Lista de Produtos</h1>
+    <ul id="lista-produtos"></ul>
+
+    <h2>Adicionar Produto</h2>
+    <form id="form-produto">
+        <input type="text" id="nome" placeholder="Nome" required><br>
+        <input type="number" step="0.01" id="preco" placeholder="Preço" required><br>
+        <input type="number" id="estoque" placeholder="Estoque" required><br>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <script>
+        const listarProdutos = () => {
+            fetch('/api/produtos/')
+                .then(res => res.json())
+                .then(produtos => {
+                    const lista = document.getElementById('lista-produtos');
+                    lista.innerHTML = '';
+                    produtos.forEach(p => {
+                        const li = document.createElement('li');
+                        li.textContent = `${p.nome} - R$ ${p.preco} - Estoque: ${p.estoque}`;
+                        lista.appendChild(li);
+                    });
+                });
+        };
+
+        document.getElementById('form-produto').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const preco = document.getElementById('preco').value;
+            const estoque = document.getElementById('estoque').value;
+
+            fetch('/api/produtos/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, preco, estoque })
+            })
+            .then(res => res.json())
+            .then(() => {
+                listarProdutos();
+                this.reset();
+            });
+        });
+
+        listarProdutos();
+    </script>
+</body>
+</html>
